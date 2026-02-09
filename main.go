@@ -63,6 +63,6 @@ func startHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 func helpHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text:   "used /book to book a room. /cancel to cancel a booking request.",
+		Text:   "used /book to book a room." + "\n" + "/cancel to cancel a booking request.",
 	})
 }
