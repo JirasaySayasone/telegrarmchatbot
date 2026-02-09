@@ -41,6 +41,7 @@ func main() {
 	}
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, startHandler)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "/help", bot.MatchTypeExact, helpHandler)
 
 	b.Start(ctx)
 }
@@ -56,5 +57,12 @@ func startHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
 		Text:   "ສະບາຍດີ",
+	})
+}
+
+func helpHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.Message.Chat.ID,
+		Text:   "used /book to book a room. /cancel to cancel a booking request.",
 	})
 }
