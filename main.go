@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -13,7 +14,14 @@ import (
 // Send any text message to the bot after the bot has been started
 
 func main() {
-	filePath := "C:/Users/Advice/Desktop/project/Telegram_ChatBot/telegrarmchatbot/Token.txt"
+	// Get the current working directory
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("unable to get working directory: %v", err)
+	}
+
+	// Construct dynamic path to Token.txt
+	filePath := filepath.Join(wd, "Token.txt")
 	contentBytes, err := os.ReadFile(filePath) // Read the file into a byte slice
 	if err != nil {
 		log.Fatalf("unable to read file: %v", err)
