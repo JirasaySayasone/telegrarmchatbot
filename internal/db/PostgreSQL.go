@@ -118,3 +118,24 @@ func GetRoomByTime(db *sql.DB, startTime time.Time, endTime time.Time) ([]model.
 
 	return rooms, nil
 }
+
+func getRoombyID(db *sql.DB, roomID int) (*model.Room, error) {
+	query := `
+	SELECT room_id, booked_by, day, month, year, timestamp_start, timestamp_end, booking_no, created_at
+	FROM rooms 
+	WHERE room_id = $1`
+
+	var room model.Room
+	err := db.QueryRow(query, roomID).Scan(
+		&room.RoomID, &room.Booked_by, &room.Day, &room.Month, &room.Year,
+		&room.Timestamp_start, &room.Timestamp_end, &room.Booking_no, &room.Create_at)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // Room not found
+		}
+		return nil, err // Other error
+	}
+
+	return &room, nil
+}
