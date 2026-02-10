@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"telegrarmchatbot/internal/model"
+	"time"
 )
 
 func Connect() (*sql.DB, error) {
@@ -44,11 +45,7 @@ func createRoomTable(db *sql.DB) error {
 }
 func getUserbyName(db *sql.DB, booker string) ([]model.User, error) {
 	query := `SELECT  
-	id,
-	username,
-	participants,
-	topic,
-	created_at
+	id, username, participants, topic, created_at
 	FROM users WHERE Booker = $1
 	ORDER BY created_at DESC`
 	rows, err := db.Query(query, booker)
@@ -56,6 +53,7 @@ func getUserbyName(db *sql.DB, booker string) ([]model.User, error) {
 		return nil, err
 	}
 	defer rows.Close()
+
 	var Users []model.User
 	for rows.Next() {
 		var User model.User
@@ -66,4 +64,57 @@ func getUserbyName(db *sql.DB, booker string) ([]model.User, error) {
 		Users = append(Users, User)
 	}
 	return Users, nil
+}
+
+func GetRoomsByBooker(db *sql.DB, bookedBy string) ([]model.Room, error) {
+	query := `
+	SELECT room_id, booked_by, day, month, year, timestamp_start, timestamp_end, booking_no, created_at
+	FROM rooms 
+	WHERE booked_by = $1 
+	ORDER BY created_at DESC`
+
+	rows, err := db.Query(query, bookedBy)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var rooms []model.Room
+	for rows.Next() {
+		var room model.Room
+		err := rows.Scan(&room.RoomID, &room.Booked_by, &room.Day, &room.Month, &room.Year,
+			&room.Timestamp_start, &room.Timestamp_end, &room.Booking_no, &room.Create_at)
+		if err != nil {
+			return nil, err
+		}
+		rooms = append(rooms, room)
+	}
+
+	return rooms, nil
+}
+func GetRoomByTime(db *sql.DB, startTime time.Time, endTime time.Time) ([]model.Room, error) {
+	query := `
+	SELECT room_id, booked_by, day, month, year, timestamp_start, timestamp_end, booking_no, created_at
+	FROM rooms 
+	WHERE timestamp_start >= $1 AND timestamp_end <= $2
+	ORDER BY timestamp_start ASC`
+
+	rows, err := db.Query(query, startTime, endTime)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var rooms []model.Room
+	for rows.Next() {
+		var room model.Room
+		err := rows.Scan(&room.RoomID, &room.Booked_by, &room.Day, &room.Month, &room.Year,
+			&room.Timestamp_start, &room.Timestamp_end, &room.Booking_no, &room.Create_at)
+		if err != nil {
+			return nil, err
+		}
+		rooms = append(rooms, room)
+	}
+
+	return rooms, nil
 }
