@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"telegrarmchatbot/internal/model"
 )
 
 func Connect() (*sql.DB, error) {
@@ -15,8 +16,7 @@ func createUserTable(db *sql.DB) error {
 		participants TEXT,
 		topic TEXT,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	)
-	`
+	)`
 	_, err := db.Exec(query)
 	if err != nil {
 		return err
@@ -25,6 +25,7 @@ func createUserTable(db *sql.DB) error {
 }
 func createRoomTable(db *sql.DB) error {
 	query := `
+	CREATE TABLE IF NOT EXISTS rooms (
 	room_id SERIAL PRIMARY KEY,
 	booked_by VARCHAR(100) NOT NULL,
 	day INTEGER NOT NULL,
@@ -34,10 +35,35 @@ func createRoomTable(db *sql.DB) error {
 	timestamp_end TIMESTAMP NOT NULL,
 	booking_no VARCHAR(100) NOT NULL,
 	create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	`
+	)`
 	_, err := db.Exec(query)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+func getUserbyName(db *sql.DB, booker string) ([]model.User, error) {
+	query := `SELECT  
+	id,
+	username,
+	participants,
+	topic,
+	created_at
+	FROM users WHERE Booker = $1
+	ORDER BY created_at DESC`
+	rows, err := db.Query(query, booker)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var Users []model.User
+	for rows.Next() {
+		var User model.User
+		err := rows.Scan(&User.UserID, &User.Booker, &User.Participants, &User.Topic)
+		if err != nil {
+			return nil, err
+		}
+		Users = append(Users, User)
+	}
+	return Users, nil
 }
