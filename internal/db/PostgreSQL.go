@@ -7,7 +7,6 @@ import (
 func Connect() (*sql.DB, error) {
 	return sql.Open("postgres", "postgres://user:password@localhost:8080/dbname")
 }
-
 func createUserTable(db *sql.DB) error {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
@@ -24,7 +23,6 @@ func createUserTable(db *sql.DB) error {
 	}
 	return nil
 }
-
 func createRoomTable(db *sql.DB) error {
 	query := `
 	room_id SERIAL PRIMARY KEY,
